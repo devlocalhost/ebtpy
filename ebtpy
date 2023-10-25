@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+
+"""
+ebtpy -- a python script to beautify the csv data from eurobilltracker
+"""
+
+import sys
+
+from collections import Counter
+
+try:
+    sys.argv[1]
+
+except IndexError:
+    sys.exit("File missing. Usage: ./ebtpy CSV_FILE")
+
+countries = []
+notes = []
+countries_code = {
+    "Belgium": "Z",
+    "Germany": "X",
+    "Estonia": "D",
+    "Ireland": "T",
+    "Greece": "Y",
+    "Spain": "V",
+    "France": "U",
+    "Italy": "S",
+    "Cyprus": "G",
+    "Latvia": "C",
+    "Lithuania": "B",
+    "Luxembourg": "1",
+    "Malta": "F",
+    "Netherlands": "P",
+    "Austria": "N",
+    "Portugal": "M",
+    "Slovenia": "H",
+    "Slovakia": "E",
+    "Finland": "L",
+}
+
+
+def most_common(list_data):
+    """
+    get most common item in a list including the count
+    """
+
+    counter = Counter(list_data)
+
+    most_common_data = counter.most_common(1)[0]
+    common_item, count = most_common_data
+
+    return common_item, count
+
+
+with open(sys.argv[1], encoding="utf-8") as f:
+    next(f)
+
+    for line in f:
+        data = line.split(";")
+
+        note = data[0]
+        note_serial = data[2]
+
+        notes.append(note)
+
+        for country in countries_code.items():
+            if country[1] == note_serial[:1]:
+                note_country = country[0]
+                countries.append(note_country)
+
+most_common_notes = most_common(notes)
+most_common_country = most_common(countries)
+
+print(
+    f"You have entered {len(notes)} notes in total\nMost common    note: "
+    f"{most_common_notes[0]:<11} (count: {most_common_notes[1]})\nMost "
+    f"common country: {most_common_country[0]:<11} (count: {most_common_country[1]})"
+)
